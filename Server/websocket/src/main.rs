@@ -15,7 +15,7 @@ async fn main() {
         .and(warp::ws())
         .and(with_clients(clients.clone()))
         .map(|webs: warp::ws::Ws, clients| {
-            webs.on_upgrade(|websocket| handler(websocket, clients))
+            webs.on_upgrade(|websocket| handler_client(websocket, clients))
         });
 
     warp::serve(route).run(([127, 0, 0, 1], 9001)).await;
@@ -27,7 +27,7 @@ fn with_clients(
     warp::any().map(move || clients.clone())
 }
 
-async fn handler(ws: WebSocket, clients: Client) {
+async fn handler_client(ws: WebSocket, clients: Client) {
     let (mut sender, mut receiver) = ws.split();
 
     let client_id = rand::thread_rng().gen::<u32>().to_string();

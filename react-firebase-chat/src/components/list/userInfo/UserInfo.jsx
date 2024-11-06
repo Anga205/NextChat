@@ -1,4 +1,4 @@
-import "./UserInfo.css";
+import "./userInfo.css";
 const userInfo = () => {
   return (
     <div className="userInfo">

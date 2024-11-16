@@ -488,27 +488,25 @@ app.post('/getAllOutgoingInvites', async (req, res) => {
 
 // Request Body Format:
 // {
-//     "id": "5f9b3b3b3b3b3b3b3b3b3b3b",
+//     "username": "anga",
+//     "password": "abcd"
 // }
-
 app.post('/getUserInfo', async (req, res) => {
-    const { id, username } = req.body;
+    const { username, password } = req.body;
 
-    if (!id && !username) {
+    if (!username || !password) {
         return res.status(400).send('Invalid data format');
     }
 
     try {
-        const { accountsCollection } = await initializeDatabase();
-        let user;
-        if (id) {
-            user = await accountsCollection.findOne({ _id: ObjectId.createFromHexString(id) });
-        } else if (username) {
-            user = await accountsCollection.findOne({ username: username });
-        }
-
+        const user = await getUserInfoFromUsername(username);
         if (!user) {
             return res.status(404).send('User not found');
+        }
+
+        const match = await comparePassword(password, user.hashed_password);
+        if (!match) {
+            return res.status(401).send('Incorrect password');
         }
 
         return res.status(200).json(user);

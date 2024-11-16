@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import './chatList.css'
+import './ChatList.css'
 
 const chatList = () => {
   const [addMode, setAddMode] = useState(false)

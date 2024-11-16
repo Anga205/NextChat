@@ -121,8 +121,18 @@ app.use(bodyParser.json());
 app.post('/newUser', async (req, res) => {
     let { username, displayName, hashed_password, password, timestamp, pendingInvites, friends } = req.body;
 
-    if (!username || !displayName || !timestamp || !Array.isArray(pendingInvites) || !Array.isArray(friends)) {
+    if (!username || !displayName || !Array.isArray(pendingInvites) || !Array.isArray(friends)) {
         return res.status(400).send('Invalid data format');
+    }
+
+    // Check if username is alphanumeric and has a length between 8 and 32
+    const usernameRegex = /^[a-zA-Z0-9]{4,32}$/;
+    if (!usernameRegex.test(username)) {
+        return res.status(400).send('Username must be alphanumeric and between 8 and 32 characters long');
+    }
+
+    if (!timestamp) {
+        timestamp = new Date().getTime();
     }
 
     if (!hashed_password) {
@@ -395,6 +405,45 @@ app.post('/sendInvite', async (req, res) => {
         return res.status(500).send('Server error');
     }
 });
+
+// Request Body Format:
+// {
+//     "sender": "anga",
+//     "recipient": "angad"
+// }
+app.post('/cancelInvite', async (req, res) => {
+    const { sender, recipient } = req.body;
+
+    if (!sender || !recipient) {
+        return res.status(400).send('Invalid data format');
+    }
+
+    try {
+        const senderUser = await getUserInfoFromUsername(sender);
+        if (!senderUser) {
+            return res.status(404).send('Sender not found');
+        }
+
+        const recipientUser = await getUserInfoFromUsername(recipient);
+        if (!recipientUser) {
+            return res.status(404).send('Recipient not found');
+        }
+
+        if (!recipientUser.pendingInvites.map(id => id.toString()).includes(senderUser._id.toString())) {
+            return res.status(400).send('Invite not found');
+        }
+
+        const { accountsCollection } = await initializeDatabase();
+        const result = await accountsCollection.updateOne(
+            { username: recipient },
+            { $pull: { pendingInvites: senderUser._id } }
+        );
+
+        return res.status(200).send(result);
+    } catch (error) {
+        return res.status(500).send('Server error');
+    }
+})
 
 app.listen(port, () => {
     console.log(`QuickChat listening at http://localhost:${port}`);

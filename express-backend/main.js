@@ -125,10 +125,10 @@ app.post('/newUser', async (req, res) => {
         return res.status(400).send('Invalid data format');
     }
 
-    // Check if username is alphanumeric and has a length between 8 and 32
+    // Check if username is alphanumeric and has a length between 4 and 32
     const usernameRegex = /^[a-zA-Z0-9]{4,32}$/;
     if (!usernameRegex.test(username)) {
-        return res.status(400).send('Username must be alphanumeric and between 8 and 32 characters long');
+        return res.status(400).send('Username must be alphanumeric and between 4 and 32 characters long');
     }
 
     if (!timestamp) {
@@ -180,6 +180,14 @@ app.post('/removeUser', async (req, res) => {
         if (!userExists) {
             return res.status(404).send('User does not exist');
         }
+
+        const { accountsCollection } = await initializeDatabase();
+
+        // Remove user from everyone's friends list and pending invites
+        await accountsCollection.updateMany(
+            {},
+            { $pull: { friends: userExists._id, pendingInvites: userExists._id } }
+        );
 
         const removeResult = await removeUser(username);
         if (removeResult) {
@@ -444,6 +452,71 @@ app.post('/cancelInvite', async (req, res) => {
         return res.status(500).send('Server error');
     }
 })
+
+
+// Request Body Format:
+// {
+//     "username": "anga",
+//     "password": "abcd"
+// }
+app.post('/getAllOutgoingInvites', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).send('Invalid data format');
+    }
+
+    try {
+        const user = await getUserInfoFromUsername(username);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        const match = await comparePassword(password, user.hashed_password);
+        if (!match) {
+            return res.status(401).send('Incorrect password');
+        }
+
+        const { accountsCollection } = await initializeDatabase();
+        const outgoingInvites = await accountsCollection.find({ pendingInvites: user._id }).toArray();
+        return res.status(200).json(outgoingInvites);
+    } catch (error) {
+        return res.status(500).send('Server error');
+    }
+})
+
+
+// Request Body Format:
+// {
+//     "id": "5f9b3b3b3b3b3b3b3b3b3b3b",
+// }
+
+app.post('/getUserInfo', async (req, res) => {
+    const { id, username } = req.body;
+
+    if (!id && !username) {
+        return res.status(400).send('Invalid data format');
+    }
+
+    try {
+        const { accountsCollection } = await initializeDatabase();
+        let user;
+        if (id) {
+            user = await accountsCollection.findOne({ _id: ObjectId.createFromHexString(id) });
+        } else if (username) {
+            user = await accountsCollection.findOne({ username: username });
+        }
+
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        return res.status(200).json(user);
+    } catch (error) {
+        return res.status(500).send('Server error');
+    }
+});
+
 
 app.listen(port, () => {
     console.log(`QuickChat listening at http://localhost:${port}`);

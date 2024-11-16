@@ -334,6 +334,68 @@ app.post('/deleteMessage', async (req, res) => {
     }
 });
 
+
+// Request Body Format:
+// {
+//     "sender": "anga",
+//     "recipient": "angad"
+// }
+app.post('/sendInvite', async (req, res) => {
+    const { sender, recipient } = req.body;
+
+    if (!sender || !recipient) {
+        return res.status(400).send('Invalid data format');
+    }
+
+    try {
+        const senderUser = await getUserInfoFromUsername(sender);
+        if (!senderUser) {
+            return res.status(404).send('Sender not found');
+        }
+
+        const recipientUser = await getUserInfoFromUsername(recipient);
+        if (!recipientUser) {
+            return res.status(404).send('Recipient not found');
+        }
+
+        if (recipientUser.pendingInvites.includes(senderUser._id)) {
+            return res.status(400).send('Invite already sent');
+        }
+
+        if (recipientUser.friends.includes(senderUser._id) && senderUser.friends.includes(recipientUser._id)) {
+            return res.status(400).send('Users are already friends');
+        }
+
+        const { accountsCollection } = await initializeDatabase();
+
+        if (senderUser.pendingInvites.map(id => id.toString()).includes(recipientUser._id.toString())) {
+            await accountsCollection.updateOne(
+                { username: sender },
+                { $pull: { pendingInvites: recipientUser._id }, $push: { friends: recipientUser._id } }
+            );
+            await accountsCollection.updateOne(
+                { username: recipient },
+                { $push: { friends: senderUser._id } }
+            );
+            return res.status(200).send('Friend request accepted');
+        }
+
+        // Add sender's invite to recipient's pending invites if not already present
+        const result = await accountsCollection.updateOne(
+            { username: recipient, pendingInvites: { $ne: senderUser._id } },
+            { $push: { pendingInvites: senderUser._id } }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(400).send('Invite already sent');
+        }
+
+        return res.status(200).send(result);
+    } catch (error) {
+        return res.status(500).send('Server error');
+    }
+});
+
 app.listen(port, () => {
     console.log(`QuickChat listening at http://localhost:${port}`);
 }).on('error', (err) => {

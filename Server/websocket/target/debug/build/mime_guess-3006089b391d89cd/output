@@ -1,0 +1,1 @@
+cargo:rustc-env=MIME_TYPES_GENERATED_PATH=/home/hemanth_arch/PESU/SEM_3/WEB_T/MernChat/Server/websocket/target/debug/build/mime_guess-3006089b391d89cd/out/mime_types_generated.rs

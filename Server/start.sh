@@ -1,5 +1,9 @@
-export GMAIL_USER=krh7799@gmail.com
-export GMAIL_PASS= ""
-npm install
+To install rust and run the socket :
 
-npm start
+curl https://sh.rustup.rs -sSf | sh
+cd websocket
+cargo build 
+cargo run
+
+
+Then run server from another terminal

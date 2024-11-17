@@ -5,6 +5,7 @@ const app = express();
 const port = 3000;
 const { ObjectId } = require('mongodb');
 const { MongoClient } = require('mongodb');
+const cors = require('cors');
 const adminPassword = 'adminpassword';
 
 
@@ -107,7 +108,11 @@ app.get('/', (_, res) => {
 
 
 app.use(bodyParser.json());
-
+app.use(cors({
+    origin: '*',
+    methods: '*',
+    allowedHeaders: '*'  
+}));
 
 // Request Body Format:
 // {

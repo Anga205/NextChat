@@ -117,16 +117,16 @@ app.use(cors({
 // Request Body Format:
 // {
 //     "username": "anga",
-//     "displayName": "Angad Bhalla",
+//     "display_name": "Angad Bhalla",
 //     "password": "abcd",
 //     "timestamp": 5347980,
 //     "pendingInvites": [],
 //     "friends": []
 // }
 app.post('/newUser', async (req, res) => {
-    let { username, displayName, hashed_password, password, timestamp, pendingInvites, friends } = req.body;
+    let { username, display_name, hashed_password, password, timestamp, pendingInvites, friends } = req.body;
 
-    if (!username || !displayName || !Array.isArray(pendingInvites) || !Array.isArray(friends)) {
+    if (!username || !display_name || !Array.isArray(pendingInvites) || !Array.isArray(friends)) {
         return res.status(400).json({ error: 'Invalid data format' });
     }
 
@@ -138,6 +138,14 @@ app.post('/newUser', async (req, res) => {
 
     if (!timestamp) {
         timestamp = new Date().getTime();
+    }
+
+    if (!pendingInvites) {
+        pendingInvites = [];
+    }
+
+    if (!friends) {
+        friends = [];
     }
 
     if (!hashed_password) {
@@ -154,7 +162,7 @@ app.post('/newUser', async (req, res) => {
             return res.status(500).json({ error: 'Username already exists' });
         }
 
-        const insertResult = await insertUser({ username, displayName, hashed_password, timestamp, pendingInvites, friends });
+        const insertResult = await insertUser({ username, display_name, hashed_password, timestamp, pendingInvites, friends });
         if (insertResult) {
             return res.status(201).json(insertResult);
         } else {
@@ -519,6 +527,45 @@ app.post('/getUserInfo', async (req, res) => {
         return res.status(500).json({error:'Server error'});
     }
 });
+
+
+// Request Body Format:
+// {
+//     "username": "angad",
+//     "password": "abcd"
+// }
+app.post('/getFriends', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Invalid data format' });
+    }
+
+    try {
+        const user = await getUserInfoFromUsername(username);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const match = await comparePassword(password, user.hashed_password);
+        if (!match) {
+            return res.status(401).json({ error: 'Incorrect password' });
+        }
+
+        const { accountsCollection } = await initializeDatabase();
+        const friends = await accountsCollection.find({ _id: { $in: user.friends } }).toArray();
+
+        // Remove hashed_password from friends data
+        const friendsWithoutPassword = friends.map(friend => {
+            const { hashed_password, ...friendWithoutPassword } = friend;
+            return friendWithoutPassword;
+        });
+
+        return res.status(200).json(friendsWithoutPassword);
+    } catch (error) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+})
 
 
 app.listen(port, () => {

@@ -38,7 +38,7 @@ body {
   }
   
   input[type="text"],
-  input[type="email"],
+  input[type="username"],
   input[type="password"] {
     width: 100%;
     padding: 12px;
@@ -51,7 +51,7 @@ body {
   }
   
   input[type="text"]:focus,
-  input[type="email"]:focus,
+  input[type="username"]:focus,
   input[type="password"]:focus {
     outline: none;
     border-color: #007bff;

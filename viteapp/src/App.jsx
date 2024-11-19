@@ -10,6 +10,7 @@ import SettingsPage from './components/settingsPage';
 import SendReq from './components/SendReq';
 
 function App() {
+
   return (
     <Router>
       <div className="App">

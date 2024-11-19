@@ -6,17 +6,20 @@ const VerticalNavbar = () => {
   const navigate = useNavigate(); // Initialize useNavigate hook
 
   const handleLogout = () => {
-    // Perform any logout logic here (e.g., clearing user data, token, etc.)
-    // After that, navigate to the Login page
-    navigate('/login'); // Redirect to Login page
+    localStorage.clear();
+    navigate('/Login');
   };
+
+  const display_name = localStorage.getItem('display_name');
+  const username = localStorage.getItem('username');
 
   return (
     <div className="vertical-navbar">
       {/* Profile Section */}
       <div className="profile-section">
         <div className="profile-icon">👤</div>
-        <div className="profile-name">User Name</div>
+        <div className="profile-name">{ display_name }</div>
+        <div className="profile-name">({ username })</div>
       </div>
 
       {/* Navigation Links / Contacts List */}

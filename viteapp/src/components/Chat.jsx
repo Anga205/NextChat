@@ -30,12 +30,56 @@
 
 // export default Chat;
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import VerticalNavbar from './VerticalNavbar';  // Import the navbar
 import ContactList from './ContactList';  // Import the contact list
 import './Chat.css';  // Import your chat styles
 
 const Chat = () => {
+
+  const username = localStorage.getItem('username');
+  const display_name = localStorage.getItem('display_name');
+  const password = localStorage.getItem('password');
+
+  const [friends, setFriends] = useState([]);
+
+  useEffect(() => {
+    if (username && password) {
+      fetch('http://localhost:3000/getFriends', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            window.alert(data.error);
+          } else {
+            setFriends(data);
+          }
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    }
+  }, []);
+
+  const [selectedFriend, setSelectedFriend] = useState(null);
+
+  useEffect(() => {
+    const storedFriend = JSON.parse(localStorage.getItem('selectedFriend'));
+    if (storedFriend) {
+      setSelectedFriend(storedFriend);
+    } else if (friends.length >= 1) {
+      setSelectedFriend({'id':friends[0]._id, 'display_name':friends[0].display_name, 'username':friends[0].username});
+      localStorage.setItem('selectedFriend', JSON.stringify({'id':friends[0]._id, 'display_name':friends[0].display_name, 'username':friends[0].username}));
+    } else {
+      console.error('No friends available');
+    }
+  }, [friends]);
+
   const [messages, setMessages] = useState([
     { id: 1, text: 'Hello, how are you?', sender: 'other' },  // other for received message
     { id: 2, text: 'I am fine, thank you!', sender: 'user' },  // user for sent message
@@ -60,7 +104,7 @@ const Chat = () => {
 
         {/* Chat Section */}
         <div className="chat-area">
-          <div className="chat-header">Chat with Person 1</div>
+          <div className="chat-header">Chat with {selectedFriend.display_name}</div>
           <div className="chat-messages">
             {/* Loop through messages and display them */}
             {messages.map((msg) => (

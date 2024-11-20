@@ -1,5 +1,4 @@
 const express = require('express');
-const { hashPassword, comparePassword } = require('./passwordHasher.js');
 const bodyParser = require('body-parser');
 const app = express();
 const port = 3000;
@@ -7,6 +6,7 @@ const { ObjectId } = require('mongodb');
 const { MongoClient } = require('mongodb');
 const cors = require('cors');
 const adminPassword = 'adminpassword';
+const bcrypt = require('bcrypt');
 
 
 let databaseInitialized = false;
@@ -18,7 +18,6 @@ async function initializeDatabase() {
             await client.connect();
             const adminDb = client.db().admin();
 
-            // Check if the database exists
             const databasesList = await adminDb.listDatabases();
             const dbExists = databasesList.databases.some(db => db.name === 'quickchat');
 
@@ -32,9 +31,6 @@ async function initializeDatabase() {
             }
 
             databaseInitialized = true;
-            const accountsCollection = client.db('quickchat').collection('accountdata');
-            const chatdataCollection = client.db('quickchat').collection('chatdata');
-            return { accountsCollection, chatdataCollection };
         } catch (err) {
             console.error(err);
         }
@@ -52,6 +48,25 @@ async function insertUser(userinfo) {
     } catch (err) {
         console.error(err);
         return false;
+    }
+}
+
+async function hashPassword(password) {
+    const saltRounds = 10;
+    try {
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+        return hashedPassword;
+    } catch (error) {
+        console.error('Error hashing password:', error);
+    }
+}
+
+async function comparePassword(plainPassword, hashedPassword) {
+    try {
+        const match = await bcrypt.compare(plainPassword, hashedPassword);
+        return match; // Returns true if passwords match, false otherwise
+    } catch (error) {
+        console.error('Error comparing passwords:', error);
     }
 }
 
@@ -126,7 +141,7 @@ app.use(cors({
 app.post('/newUser', async (req, res) => {
     let { username, display_name, hashed_password, password, timestamp, pendingInvites, friends } = req.body;
 
-    if (!username || !display_name || !Array.isArray(pendingInvites) || !Array.isArray(friends)) {
+    if (!username || !display_name) {
         return res.status(400).json({ error: 'Invalid data format' });
     }
 
@@ -182,13 +197,29 @@ app.post('/newUser', async (req, res) => {
 //     "admin": "adminpassword"
 // }
 app.post('/removeUser', async (req, res) => {
-    const { username, admin } = req.body;
+    const { username, admin, password } = req.body;
 
-    if (!username || admin !== adminPassword) {
-        return res.status(400).json({ error: 'Invalid data format or unauthorized' });
+    if (!username || (!admin && !password)) {
+        return res.status(400).json({ error: 'Invalid data format' });
     }
 
     try {
+        if (admin) {
+            if (admin !== adminPassword) {
+                return res.status(401).json({ error: 'Unauthorized' });
+            }
+        } else {
+            const user = await getUserInfoFromUsername(username);
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const match = await comparePassword(password, user.hashed_password);
+            if (!match) {
+                return res.status(401).json({ error: 'Incorrect password' });
+            }
+        }
+
         const userExists = await checkIfUsernameExists(username);
         if (!userExists) {
             return res.status(404).json({ error: 'User does not exist' });
@@ -433,9 +464,9 @@ app.post('/sendInvite', async (req, res) => {
 //     "recipient": "angad"
 // }
 app.post('/cancelInvite', async (req, res) => {
-    const { sender, recipient } = req.body;
+    const { sender, password, recipient } = req.body;
 
-    if (!sender || !recipient) {
+    if (!sender || !recipient || !password) {
         return res.status(400).json({ error: 'Invalid data format' });
     }
 
@@ -448,6 +479,11 @@ app.post('/cancelInvite', async (req, res) => {
         const recipientUser = await getUserInfoFromUsername(recipient);
         if (!recipientUser) {
             return res.status(404).json({ error: 'Recipient not found' });
+        }
+
+        const match = await comparePassword(password, senderUser.hashed_password);
+        if (!match) {
+            return res.status(401).json({ error: 'Incorrect password' });
         }
 
         if (!recipientUser.pendingInvites.map(id => id.toString()).includes(senderUser._id.toString())) {
@@ -564,6 +600,46 @@ app.post('/getFriends', async (req, res) => {
         return res.status(200).json(friendsWithoutPassword);
     } catch (error) {
         return res.status(500).json({ error: 'Server error' });
+    }
+})
+
+// Request Body Format:
+// {
+//     "username": "anga",
+//     "password": "abcd",
+//     "messagesWith": "angad"
+// }
+app.post('/getMessages', async (req, res) => {
+    const { username, password, messagesWith } = req.body;
+
+    if (!username || !password || !messagesWith) {
+        return res.status(400).json({ error: 'Invalid data format' });
+    }
+
+    try {
+        const user = await getUserInfoFromUsername(username);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const match = await comparePassword(password, user.hashed_password);
+        if (!match) {
+            return res.status(401).json({ error: 'Incorrect password' });
+        }
+
+        const messagesWithUserObj = await getUserInfoFromUsername(messagesWith);
+
+        const { chatdataCollection } = await initializeDatabase();
+        const messagesWithUser = await chatdataCollection.find({
+            $or: [
+                { senderId: user._id, recipientId: messagesWithUserObj._id },
+                { senderId: messagesWithUserObj._id, recipientId: user._id }
+            ]
+        }).toArray();
+
+        return res.status(200).json(messagesWithUser);
+    } catch (error) {
+        return res.status(500).json({ error: 'Server error: '+error });
     }
 })
 

@@ -14,7 +14,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (username && password) {
-      fetch('http://localhost:3000/getFriends', {
+      fetch('https://3000.angadbhalla.com/getFriends', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +42,7 @@ const Chat = () => {
   var [selectedFriendId, setSelectedFriendId] = useState('{SELECTED_FRIEND_ID}');
 
   function updateMessages() {
-    fetch('http://localhost:3000/getMessages', {
+    fetch('https://3000.angadbhalla.com/getMessages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ const Chat = () => {
 
   const handleSendMessage = () => {
     if (message.trim() !== '') {
-      fetch('http://localhost:3000/sendMessage', {
+      fetch('https://3000.angadbhalla.com/sendMessage', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

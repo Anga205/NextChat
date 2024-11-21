@@ -53,72 +53,37 @@ const SettingsPage = () => {
     })
   }
 
+  const [displayName, setDisplayName] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showInputs, setShowInputs] = useState(true);
+
+  const handleInputChange = (setter) => (e) => {
+    setter(e.target.value);
+    if (e.target.value.trim()) {
+      setShowInputs(false);
+    } else {
+      setShowInputs(true);
+    }
+  };
+
+  const handleSaveChanges = () => {
+    // Implement save changes logic here
+    console.log('Changes saved');
+  };
+
+
   return (
-    <div className="p-5 font-sans text-left" style={{ width: '200%' }}>
+    <div className="p-5 font-sans text-left" style={{ width: '100%' }}>
       <h2 className="mb-5 text-2xl font-bold">Settings</h2>
 
-      {/* Profile Picture Section */}
-      <div className="mb-5">
-        <img src={profilePic} alt="Profile" className="w-30 h-30 rounded-full object-cover mb-2" />
-        <input type="file" accept="image/*" onChange={handleProfilePicChange} className="mt-2" />
-        <span className="block mt-2">Change Profile Picture</span>
-      </div>
-
-      <hr className="my-4" />
-
-      {/* Bio Section */}
-      <div className="mb-5">
-        <h3 className="text-xl font-semibold">Your Bio</h3>
-        <p className="mb-2">{bio}</p>
-        <input
-          type="text"
-          value={newBio}
-          onChange={(e) => setNewBio(e.target.value)}
-          placeholder="Update your bio"
-          className="w-full p-2 mt-2 rounded border border-gray-300"
-        />
-        <button onClick={handleBioChange} className="p-2 mt-2 bg-blue-500 text-white rounded hover:bg-blue-700">
-          Save Bio
-        </button>
-      </div>
-
-      <hr className="my-4" />
-
-      {/* Theme Section */}
-      <div className="mb-5">
-        <h3 className="text-xl font-semibold">Theme</h3>
-        <select value={theme} onChange={handleThemeChange} className="p-2 mt-2 rounded border border-gray-300">
-          <option value="light">Light Mode</option>
-          <option value="dark">Dark Mode</option>
-        </select>
-      </div>
-
-      <hr className="my-4" />
-
-      {/* Notification Section */}
-      <div className="mb-5">
-        <h3 className="text-xl font-semibold">Notifications</h3>
-        <label className="text-lg">
-          <input
-            type="checkbox"
-            checked={notifications}
-            onChange={handleNotificationToggle}
-            className="mr-2"
-          />
-          Receive Notifications
-        </label>
-      </div>
-
-      <hr className="my-4" />
-
       {/* Account Settings Section */}
-      <div className="mb-5">
+      <div className="mb-5"></div>
         <h3 className="text-xl font-semibold">Account Settings</h3>
         <button className="p-2 mt-2 bg-red-500 text-white rounded hover:bg-red-700" onClick={handleDelete}>
           Delete Account
         </button>
       </div>
-    </div>
   );
 };
 

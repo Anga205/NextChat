@@ -21,7 +21,7 @@ const SendReq = () => {
       const password = localStorage.getItem('password');
       if (userId) {
         try {
-          const response = await fetch('http://localhost:3000/getFriends', {
+          const response = await fetch('https://3000.angadbhalla.com/getFriends', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ const SendReq = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:3000/getAllIncomingInvites', {
+        const response = await fetch('https://3000.angadbhalla.com/getAllIncomingInvites', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ const SendReq = () => {
 
   // Function to handle accept request
   const handleAccept = async (id, username) => {
-    const response = await fetch('http://localhost:3000/sendInvite', {
+    const response = await fetch('https://3000.angadbhalla.com/sendInvite', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ const SendReq = () => {
 
   // Function to handle delete friend
   const handleDeleteFriend = (id, friend_username) => {
-    const response = fetch('http://localhost:3000/removeFriend', {
+    const response = fetch('https://3000.angadbhalla.com/removeFriend', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,12 +100,12 @@ const SendReq = () => {
           placeholder="Search users"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full p-2 border border-gray-300 rounded"
+          className="w-80 p-2 border border-gray-300 rounded"
         />
       {searchQuery && !friends.some(friend => friend.display_name.toLowerCase() === searchQuery.toLowerCase()) && (
         <button
           onClick={async () => {
-            const response = await fetch('http://localhost:3000/sendInvite', {
+            const response = await fetch('https://3000.angadbhalla.com/sendInvite', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',

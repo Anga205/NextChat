@@ -18,7 +18,7 @@ MERN Chat is a real-time chat application built using the MERN (MongoDB, Express
 - **Express**: Backend framework for building the server-side application.
 - **React**: Frontend library for building the user interface.
 - **Node.js**: Runtime environment for executing server-side code.
-- **Socket.io**: Library for enabling real-time, bidirectional communication.
+- **Tailwind CSS**: Utility-first CSS framework for styling the application.
 
 ## Installation
 
@@ -55,7 +55,3 @@ MERN Chat is a real-time chat application built using the MERN (MongoDB, Express
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any enhancements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License.

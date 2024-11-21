@@ -34,6 +34,25 @@ const SettingsPage = () => {
     }
   };
 
+  function handleDelete(){
+    console.log("Delete Account: "+localStorage.getItem('id'));
+    fetch('http://localhost:3000/removeUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({username: localStorage.getItem('username'), password: localStorage.getItem('password')}),
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      localStorage.removeItem('id');
+      localStorage.removeItem('username');
+      localStorage.removeItem('password');
+      window.location.href = '/';
+    })
+  }
+
   return (
     <div className="p-5 font-sans text-left" style={{ width: '200%' }}>
       <h2 className="mb-5 text-2xl font-bold">Settings</h2>
@@ -95,7 +114,7 @@ const SettingsPage = () => {
       {/* Account Settings Section */}
       <div className="mb-5">
         <h3 className="text-xl font-semibold">Account Settings</h3>
-        <button className="p-2 mt-2 bg-red-500 text-white rounded hover:bg-red-700">
+        <button className="p-2 mt-2 bg-red-500 text-white rounded hover:bg-red-700" onClick={handleDelete}>
           Delete Account
         </button>
       </div>

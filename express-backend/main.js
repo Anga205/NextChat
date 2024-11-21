@@ -192,34 +192,41 @@ app.post('/newUser', async (req, res) => {
 // Request Body Format:
 // {
 //     "username": "angad",
+//     "password": "abcd",
 //     "admin": "adminpassword"
 // }
 app.post('/removeUser', async (req, res) => {
+    console.log("Entered /removeUser with:",req.body);
     const { username, admin, password } = req.body;
 
     if (!username || (!admin && !password)) {
+        console.log("Invalid data format");
         return res.status(400).json({ error: 'Invalid data format' });
     }
 
     try {
         if (admin) {
             if (admin !== adminPassword) {
+                console.log("Unauthorized");
                 return res.status(401).json({ error: 'Unauthorized' });
             }
         } else {
             const user = await getUserInfoFromUsername(username);
             if (!user) {
+                console.log("User not found");
                 return res.status(404).json({ error: 'User not found' });
             }
 
             const match = await comparePassword(password, user.hashed_password);
             if (!match) {
+                console.log("Incorrect password");
                 return res.status(401).json({ error: 'Incorrect password' });
             }
         }
 
         const userExists = await checkIfUsernameExists(username);
         if (!userExists) {
+            console.log("User does not exist");
             return res.status(404).json({ error: 'User does not exist' });
         }
 
@@ -233,11 +240,14 @@ app.post('/removeUser', async (req, res) => {
 
         const removeResult = await removeUser(username);
         if (removeResult) {
+            console.log("User removed successfully");
             return res.status(200).json({ message: 'User removed successfully' });
         } else {
+            console.log("Failed to remove user");
             return res.status(500).json({ error: 'Failed to remove user' });
         }
     } catch (error) {
+        console.error("Server error:",error);
         return res.status(500).json({ error: 'Server error' });
     }
 });

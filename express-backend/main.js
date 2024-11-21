@@ -692,7 +692,7 @@ app.post('/getAllIncomingInvites', async (req, res) => {
 // Request Body Format:
 // {
 //     "username": "anga",
-//     "password": "abcd"
+//     "password": "abcd",
 //     "friend_to_remove": "angad"
 // }
 app.post('/removeFriend', async (req, res) => {
@@ -718,7 +718,7 @@ app.post('/removeFriend', async (req, res) => {
             return res.status(401).json({ error: 'Incorrect password' });
         }
 
-        if (!user.friends.includes(friend._id)) {
+        if (!user.friends.map(id => id.toString()).includes(friend._id.toString())) {
             return res.status(400).json({ error: 'User is not a friend' });
         }
 
@@ -726,6 +726,11 @@ app.post('/removeFriend', async (req, res) => {
         const result = await accountsCollection.updateOne(
             { username: username },
             { $pull: { friends: friend._id } }
+        );
+
+        await accountsCollection.updateOne(
+            { username: friend_to_remove },
+            { $pull: { friends: user._id } }
         );
 
         if (result.modifiedCount === 0) {

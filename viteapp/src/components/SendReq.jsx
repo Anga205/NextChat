@@ -76,7 +76,14 @@ const SendReq = () => {
   };
 
   // Function to handle delete friend
-  const handleDeleteFriend = (id) => {
+  const handleDeleteFriend = (id, friend_username) => {
+    const response = fetch('http://localhost:3000/removeFriend', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ username: localStorage.getItem('username'), password: localStorage.getItem('password'), "friend_to_remove": friend_username }),
+    });
     setFriends(friends.filter(friend => friend.id !== id));
   };
 
@@ -156,7 +163,7 @@ const SendReq = () => {
             <div key={friend.id} className="flex items-center justify-between p-2 border-b border-gray-200 w-full">
               <span>{friend.display_name}</span>
               <button
-                onClick={() => handleDeleteFriend(friend.id)}
+                onClick={() => handleDeleteFriend(friend.id, friend.username)}
                 className="p-1 bg-gray-500 text-white rounded"
               >
                 ❌

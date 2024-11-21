@@ -27,9 +27,13 @@ const ContactList = () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
-            window.alert("Error from ContactList.jsx: "+data.error);
+            window.alert("Error from ContactList.jsx: " + data.error);
           } else {
-            setContacts(data);
+            if (data.length === 0) {
+              window.location.href = '/SendReq';
+            } else {
+              setContacts(data);
+            }
           }
         })
         .catch((error) => {
@@ -38,10 +42,14 @@ const ContactList = () => {
     }
   }, []);
 
+  const useLinkClickHandler = (id, display_name, username) => () => {
+    localStorage.setItem('selectedFriend', JSON.stringify({id, display_name, username}));
+  }
+
   return (
     <div className="contact-list">
       {contacts.map((contact) => (
-        <Link to={`/chat/${contact.id}`} key={contact.id} className="contact-item">
+        <Link onClick={useLinkClickHandler(contact._id, contact.display_name, contact.username)} key={contact._id} className="contact-item">
           <img src={"https://robohash.org/stefan-"+contact.username} alt={contact.display_name} className="contact-img" />
           <div className="contact-info">
             <div className="contact-name">{contact.display_name}</div>

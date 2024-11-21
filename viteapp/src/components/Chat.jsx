@@ -76,7 +76,7 @@ const Chat = () => {
     const storedFriend = localStorage.getItem('selectedFriend')
     if (storedFriend) {
       setSelectedFriend(JSON.parse(storedFriend));
-    } else if (friends.length >= 1) {
+    } else if (friends.length >= 1 && storedFriend === null) {
       setSelectedFriend({'id':friends[0]._id, 'display_name':friends[0].display_name, 'username':friends[0].username});
       localStorage.setItem('selectedFriend', JSON.stringify({'id':friends[0]._id, 'display_name':friends[0].display_name, 'username':friends[0].username}));
     } else {
@@ -87,6 +87,8 @@ const Chat = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (selectedFriend) {
+        const storedFriend = JSON.parse(localStorage.getItem('selectedFriend'))
+        setSelectedFriend({'id':storedFriend._id, 'display_name':storedFriend.display_name, 'username':storedFriend.username});
         updateMessages();
       }
     }, 1000);

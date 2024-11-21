@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import './SettingsPage.css'; // Include the styling for the page
 
 const SettingsPage = () => {
   const [bio, setBio] = useState('This is your initial bio');  // Default bio
@@ -36,59 +35,72 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="settings-container">
-      <h2>Settings</h2>
+    <div className="p-5 font-sans text-left" style={{ width: '200%' }}>
+      <h2 className="mb-5 text-2xl font-bold">Settings</h2>
 
       {/* Profile Picture Section */}
-      <div className="profile-section">
-        <img src={profilePic} alt="Profile" className="profile-pic" />
-        <input type="file" accept="image/*" onChange={handleProfilePicChange} />
-        <span>Change Profile Picture</span>
+      <div className="mb-5">
+        <img src={profilePic} alt="Profile" className="w-30 h-30 rounded-full object-cover mb-2" />
+        <input type="file" accept="image/*" onChange={handleProfilePicChange} className="mt-2" />
+        <span className="block mt-2">Change Profile Picture</span>
       </div>
 
+      <hr className="my-4" />
+
       {/* Bio Section */}
-      <div className="bio-section">
-        <h3>Your Bio</h3>
-        <p>{bio}</p>
+      <div className="mb-5">
+        <h3 className="text-xl font-semibold">Your Bio</h3>
+        <p className="mb-2">{bio}</p>
         <input
           type="text"
           value={newBio}
           onChange={(e) => setNewBio(e.target.value)}
           placeholder="Update your bio"
+          className="w-full p-2 mt-2 rounded border border-gray-300"
         />
-        <button onClick={handleBioChange}>Save Bio</button>
+        <button onClick={handleBioChange} className="p-2 mt-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+          Save Bio
+        </button>
       </div>
 
+      <hr className="my-4" />
+
       {/* Theme Section */}
-      <div className="theme-section">
-        <h3>Theme</h3>
-        <select value={theme} onChange={handleThemeChange}>
+      <div className="mb-5">
+        <h3 className="text-xl font-semibold">Theme</h3>
+        <select value={theme} onChange={handleThemeChange} className="p-2 mt-2 rounded border border-gray-300">
           <option value="light">Light Mode</option>
           <option value="dark">Dark Mode</option>
         </select>
       </div>
 
+      <hr className="my-4" />
+
       {/* Notification Section */}
-      <div className="notification-section">
-        <h3>Notifications</h3>
-        <label>
+      <div className="mb-5">
+        <h3 className="text-xl font-semibold">Notifications</h3>
+        <label className="text-lg">
           <input
             type="checkbox"
             checked={notifications}
             onChange={handleNotificationToggle}
+            className="mr-2"
           />
           Receive Notifications
         </label>
       </div>
 
+      <hr className="my-4" />
+
       {/* Account Settings Section */}
-      <div className="account-section">
-        <h3>Account Settings</h3>
-        <button className="delete-account-btn">Delete Account</button>
+      <div className="mb-5">
+        <h3 className="text-xl font-semibold">Account Settings</h3>
+        <button className="p-2 mt-2 bg-red-500 text-white rounded hover:bg-red-700">
+          Delete Account
+        </button>
       </div>
     </div>
   );
 };
 
 export default SettingsPage;
-

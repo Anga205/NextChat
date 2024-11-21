@@ -27,7 +27,7 @@ const ContactList = () => {
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
-            window.alert(data.error);
+            window.alert("Error from ContactList.jsx: "+data.error);
           } else {
             setContacts(data);
           }
@@ -45,7 +45,7 @@ const ContactList = () => {
           <img src={"https://robohash.org/stefan-"+contact.username} alt={contact.display_name} className="contact-img" />
           <div className="contact-info">
             <div className="contact-name">{contact.display_name}</div>
-            <div className="contact-status">{contact.status}</div>
+            <div className="contact-username">{contact.username}</div>
           </div>
         </Link>
       ))}

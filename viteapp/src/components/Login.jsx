@@ -1,5 +1,6 @@
 import React, { useState} from 'react'; // Import useState and useEffect
 import './Login.css'; // Import the CSS file
+import BGImage from "../assets/L1.svg";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -108,62 +109,69 @@ const Login = () => {
   }, []);
 
   return (
-    <div className="login-container">
-      <h2>{isLogin ? 'Login to Chat' : 'Sign Up for Chat'}</h2>
-      <form>
-        {!isLogin && (
-          <div className="input-group">
-            <label htmlFor="display_name">Display Name</label>
-            <input
-              type="text"
-              id="display_name"
-              name="display_name"
-              value={formData.display_name}
-              onChange={handleInputChange}
-              placeholder="Enter your Display Name"
-              required={!isLogin}
-            />
+    <div className="container">
+      <div className="left-panel">
+      <img src={BGImage} alt="Login" className="illustration" />
+      </div>
+      <div className="right-panel">
+        <div className="login-container">
+          <h2>{isLogin ? 'Login to Chat' : 'Sign Up for Chat'}</h2>
+          <form onSubmit={handleLogin}>
+            {!isLogin && (
+              <div className="input-group">
+                <label htmlFor="display_name">Display Name</label>
+                <input
+                  type="text"
+                  id="display_name"
+                  name="display_name"
+                  value={formData.display_name}
+                  onChange={handleInputChange}
+                  placeholder="Enter your Display Name"
+                  required
+                />
+              </div>
+            )}
+
+            <div className="input-group">
+              <label htmlFor="username">Username</label>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleInputChange}
+                placeholder="Enter your username"
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                value={formData.password}
+                onChange={handleInputChange}
+                placeholder="Enter your password"
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn-submit">
+              {isLogin ? 'Login' : 'Sign Up'}
+            </button>
+          </form>
+
+          <div className="toggle-link">
+            <p>
+              {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
+              <span className="toggle-btn" onClick={toggleForm}>
+                {isLogin ? 'Sign Up' : 'Login'}
+              </span>
+            </p>
           </div>
-        )}
-
-        <div className="input-group">
-          <label htmlFor="username">Username</label>
-          <input
-            type="username"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleInputChange}
-            placeholder="Enter your username"
-            required
-          />
         </div>
-
-        <div className="input-group">
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            placeholder="Enter your password"
-            required
-          />
-        </div>
-
-        <button type="submit" className="btn-submit" onClick={handleLogin}>
-          {isLogin ? 'Login' : 'Sign Up'}
-        </button>
-      </form>
-
-      <div className="toggle-link">
-        <p>
-          {isLogin ? "Don't have an account?" : 'Already have an account?'}{' '}
-          <span className="toggle-btn" onClick={toggleForm}>
-            {isLogin ? 'Sign Up' : 'Login'}
-          </span>
-        </p>
       </div>
     </div>
   );

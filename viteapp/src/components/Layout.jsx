@@ -5,9 +5,9 @@ import { Outlet } from 'react-router-dom';  // Import Outlet for dynamic routing
 
 const Layout = () => {
   return (
-    <div className="layout-container">
+    <div>
       <VerticalNavbar /> {/* Always show the navbar */}
-      <div className="main-content">
+      <div>
         <Outlet /> {/* Render the specific page content here */}
       </div>
     </div>

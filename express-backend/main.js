@@ -26,8 +26,6 @@ async function initializeDatabase() {
                 await db.createCollection('chatdata');
                 await db.createCollection('accountdata');
                 console.log('Database and collections created successfully.');
-            } else {
-                console.log('Database already exists.');
             }
 
             databaseInitialized = true;
@@ -400,12 +398,13 @@ app.post('/deleteMessage', async (req, res) => {
 // Request Body Format:
 // {
 //     "sender": "anga",
+//     "password": "abcd"
 //     "recipient": "angad"
 // }
 app.post('/sendInvite', async (req, res) => {
-    const { sender, recipient } = req.body;
+    const { sender, recipient, password } = req.body;
 
-    if (!sender || !recipient) {
+    if (!sender || !recipient || !password) {
         return res.status(400).json({ error: 'Invalid data format' });
     }
 
@@ -420,11 +419,16 @@ app.post('/sendInvite', async (req, res) => {
             return res.status(404).json({ error: 'Recipient not found' });
         }
 
+        const match = await comparePassword(password, senderUser.hashed_password);
+        if (!match) {
+            return res.status(401).json({ error: 'Incorrect password' });
+        }
+
         if (recipientUser.pendingInvites.includes(senderUser._id)) {
             return res.status(400).json({ error: 'Invite already sent' });
         }
 
-        if (recipientUser.friends.includes(senderUser._id) && senderUser.friends.includes(recipientUser._id)) {
+        if (recipientUser.friends.map(id => id.toString()).includes(senderUser._id.toString()) && senderUser.friends.map(id => id.toString()).includes(recipientUser._id.toString())) {
             return res.status(400).json({ error: 'Users are already friends' });
         }
 
@@ -643,6 +647,96 @@ app.post('/getMessages', async (req, res) => {
     }
 })
 
+// Request Body Format:
+// {
+//     "username": "anga",
+//     "password": "abcd"
+// }
+app.post('/getAllIncomingInvites', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Invalid data format' });
+    }
+
+    try {
+        const user = await getUserInfoFromUsername(username);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const match = await comparePassword(password, user.hashed_password);
+        if (!match) {
+            return res.status(401).json({ error: 'Incorrect password' });
+        }
+
+        const { accountsCollection } = await initializeDatabase();
+        const incomingInvites = await accountsCollection.find({ _id: { $in: user.pendingInvites } }).toArray();
+
+        // Remove hashed_password, pending invites, timestamp, friends from incoming invites data
+        const SecureInvite = incomingInvites.map(invite => {
+            const { hashed_password, ...SecureInvite } = invite;
+            delete SecureInvite.timestamp;
+            delete SecureInvite.pendingInvites;
+            delete SecureInvite.friends;
+            return SecureInvite;
+        });
+
+        return res.status(200).json(SecureInvite);
+    } catch (error) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
+// Request Body Format:
+// {
+//     "username": "anga",
+//     "password": "abcd"
+//     "friend_to_remove": "angad"
+// }
+app.post('/removeFriend', async (req, res) => {
+    const { username, password, friend_to_remove } = req.body;
+
+    if (!username || !password || !friend_to_remove) {
+        return res.status(400).json({ error: 'Invalid data format' });
+    }
+
+    try {
+        const user = await getUserInfoFromUsername(username);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const friend = await getUserInfoFromUsername(friend_to_remove);
+        if (!friend) {
+            return res.status(404).json({ error: 'Friend not found' });
+        }
+
+        const match = await comparePassword(password, user.hashed_password);
+        if (!match) {
+            return res.status(401).json({ error: 'Incorrect password' });
+        }
+
+        if (!user.friends.includes(friend._id)) {
+            return res.status(400).json({ error: 'User is not a friend' });
+        }
+
+        const { accountsCollection } = await initializeDatabase();
+        const result = await accountsCollection.updateOne(
+            { username: username },
+            { $pull: { friends: friend._id } }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(400).json({ error: 'Friend not found' });
+        }
+
+        return res.status(200).json(result);
+    } catch (error) {
+        return res.status(500).json({ error: 'Server error' });
+    }
+})
 
 app.listen(port, () => {
     console.log(`QuickChat listening at http://localhost:${port}`);

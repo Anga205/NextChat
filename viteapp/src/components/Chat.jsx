@@ -1,35 +1,3 @@
-// import React from 'react';
-// import VerticalNavbar from './VerticalNavbar';  // Import the navbar
-// import ContactList from './ContactList';  // Import the contact list
-// import './Chat.css';  // Import your chat styles
-
-// const Chat = () => {
-//   return (
-//     <div className="chat-container">
-//       <VerticalNavbar /> {/* Include the vertical navbar */}
-
-//       <div className="chat-main">
-//         {/* Contact List on the right side */}
-//         <ContactList />
-
-//         {/* Chat Section */}
-//         <div className="chat-area">
-//           <div className="chat-header">Chat with Person 1</div>
-//           <div className="chat-messages">
-//             {/* Display messages here */}
-//           </div>
-//           <div className="message-input">
-//             <input type="text" placeholder="Type a message..." />
-//             <button>Send</button>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Chat;
-
 import React, { useState, useEffect } from 'react';
 import VerticalNavbar from './VerticalNavbar';  // Import the navbar
 import ContactList from './ContactList';  // Import the contact list
@@ -40,6 +8,7 @@ const Chat = () => {
   const username = localStorage.getItem('username');
   const display_name = localStorage.getItem('display_name');
   const password = localStorage.getItem('password');
+  const userId = localStorage.getItem('id');
 
   const [friends, setFriends] = useState([]);
 
@@ -68,10 +37,45 @@ const Chat = () => {
 
   const [selectedFriend, setSelectedFriend] = useState(null);
 
+  var [selectedFriendUsername, setSelectedFriendUsername] = useState('{SELECTED_FRIEND_USERNAME}');
+  var [selectedFriendDisplayName, setSelectedFriendDisplayName] = useState('{SELECTED_FRIEND_DISPLAY_NAME}');
+  var [selectedFriendId, setSelectedFriendId] = useState('{SELECTED_FRIEND_ID}');
+
+  function updateMessages() {
+    fetch('http://localhost:3000/getMessages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username,
+        password,
+        messagesWith: selectedFriendUsername,
+      })
+    }).then((response) => response.json())
+      .then((data) => {
+        for (let i = 0; i < data.length; i++) {
+          data[i].sender = data[i].senderId === userId ? 'user' : 'other';
+          data[i].text = data[i].message.text;
+        }
+        data.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+        setMessages(data);
+      })
+  }
+
   useEffect(() => {
-    const storedFriend = JSON.parse(localStorage.getItem('selectedFriend'));
+    if (selectedFriend) {
+      setSelectedFriendUsername(selectedFriend.username);
+      setSelectedFriendDisplayName(selectedFriend.display_name);
+      setSelectedFriendId(selectedFriend.id);
+      updateMessages();
+    }
+  }, [selectedFriend]);
+
+  useEffect(() => {
+    const storedFriend = localStorage.getItem('selectedFriend')
     if (storedFriend) {
-      setSelectedFriend(storedFriend);
+      setSelectedFriend(JSON.parse(storedFriend));
     } else if (friends.length >= 1) {
       setSelectedFriend({'id':friends[0]._id, 'display_name':friends[0].display_name, 'username':friends[0].username});
       localStorage.setItem('selectedFriend', JSON.stringify({'id':friends[0]._id, 'display_name':friends[0].display_name, 'username':friends[0].username}));
@@ -79,6 +83,16 @@ const Chat = () => {
       console.error('No friends available');
     }
   }, [friends]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (selectedFriend) {
+        updateMessages();
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [selectedFriend]);
 
   const [messages, setMessages] = useState([
     { id: 1, text: 'Hello, how are you?', sender: 'other' },  // other for received message
@@ -89,22 +103,35 @@ const Chat = () => {
 
   const handleSendMessage = () => {
     if (message.trim() !== '') {
-      setMessages([...messages, { id: messages.length + 1, text: message, sender: 'user' }]);
+      fetch('http://localhost:3000/sendMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          "senderUsername": username,
+          "senderPassword": password,
+          "recipientUsername": selectedFriendUsername,
+          "message": {
+            "text": message,
+            "b64attachment": null,
+          },
+        }),
+      })
       setMessage('');
     }
-  };
+  }; 
 
   return (
     <div className="chat-container">
-      <VerticalNavbar /> {/* Include the vertical navbar */}
-
+      
       <div className="chat-main">
         {/* Contact List on the right side */}
         <ContactList />
 
         {/* Chat Section */}
         <div className="chat-area">
-          <div className="chat-header">Chat with {selectedFriend.display_name}</div>
+          <div className="chat-header">Chat with {selectedFriendDisplayName} ({selectedFriendUsername})</div>
           <div className="chat-messages">
             {/* Loop through messages and display them */}
             {messages.map((msg) => (

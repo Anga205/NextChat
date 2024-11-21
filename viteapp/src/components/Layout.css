@@ -1,0 +1,15 @@
+/* src/components/Layout.css */
+.layout-container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    margin-left: 220px; /* Adjust based on the width of your navbar */
+  }
+  
+  /* Additional styles for the layout */
+  

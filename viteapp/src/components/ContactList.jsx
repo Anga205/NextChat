@@ -17,7 +17,7 @@ const ContactList = () => {
     const username = localStorage.getItem('username');
     const password = localStorage.getItem('password');
     if (username && password) {
-      fetch('https://3000.angadbhalla.com/getFriends', {
+      fetch('http://localhost:3000/getFriends', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

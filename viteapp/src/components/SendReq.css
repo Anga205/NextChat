@@ -1,0 +1,98 @@
+/* General container styling */
+.container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: auto;
+  }
+  
+  /* Search bar styling */
+  .search-bar {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .search-bar button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .search-bar button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* Received requests and friends list sections */
+  .section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+  
+  .section h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .request-item, .friend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+  }
+  
+  .request-item span,
+  .friend-item span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  
+  .request-item button,
+  .friend-item button {
+    padding: 5px 15px;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .request-item .accept-btn {
+    background-color: #28a745;
+  }
+  
+  .request-item .accept-btn:hover {
+    background-color: #218838;
+  }
+  
+  .request-item .deny-btn,
+  .friend-item .delete-btn {
+    background-color: #dc3545;
+  }
+  
+  .request-item .deny-btn:hover,
+  .friend-item .delete-btn:hover {
+    background-color: #c82333;
+  }
+  

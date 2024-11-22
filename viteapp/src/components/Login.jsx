@@ -33,7 +33,7 @@ const Login = () => {
   function handleLogin(e) {
     e.preventDefault();
     if (isLogin) {
-      fetch('https://3000.angadbhalla.com/getUserInfo', {
+      fetch('http://localhost:3000/getUserInfo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ const Login = () => {
           console.error('Error:', error);
         });
     } else {
-      fetch('https://3000.angadbhalla.com/newUser', {
+      fetch('http://localhost:3000/newUser', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ const Login = () => {
   React.useEffect(() => {
     const userId = localStorage.getItem('id');
     if (userId) {
-      fetch('https://3000.angadbhalla.com/getUserInfo', {
+      fetch('http://localhost:3000/getUserInfo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

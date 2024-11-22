@@ -36,12 +36,7 @@ const VerticalNavbar = () => {
         {/* Add more links as needed */}
       </div>
 
-      {/* Logout Section */}
-      <div className="logout-section">
-        <button className="logout-btn" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
+
     </div>
   );
 };

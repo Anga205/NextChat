@@ -1,0 +1,87 @@
+/* General page styles */
+.settings-page {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    font-family: 'Roboto', sans-serif; /* Elegant font */
+    background-color: #f9f9f9;
+    height: 100vh;
+    color: #000; /* Black color for text */
+  }
+  
+  /* Content section styling */
+  .settings-content {
+    width: 60%;
+  }
+  
+  .settings-content h2 {
+    font-size: 2.5rem; /* Larger font size */
+    margin-bottom: 30px;
+  }
+  
+  .account-settings h3 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+  
+  .account-settings .catchy-line {
+    font-size: 1.3rem; /* Larger sentences */
+    color: #333;
+    margin: 20px 0; /* Increased gap */
+    font-style: italic;
+  }
+  
+  /* Button section styling */
+  .buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Increased gap between buttons */
+  }
+  
+  .delete-btn,
+  .logout-btn {
+    padding: 15px 25px; /* Larger buttons */
+    font-size: 1.2rem; /* Larger font size for buttons */
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .delete-btn {
+    background-color: #ff4c4c;
+    color: white;
+  }
+  
+  .delete-btn:hover {
+    background-color: #d43f3f;
+  }
+  
+  .logout-btn {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .logout-btn:hover {
+    background-color: #3d8f3d;
+  }
+  
+  /* SVG section styling */
+  .settings-svg {
+    width: 30%;
+    text-align: right;
+  }
+  
+  .settings-svg img {
+    max-width: 100%;
+    height: auto;
+    opacity: 0.9;
+    transition: opacity 0.3s ease;
+  }
+  
+  .settings-svg img:hover {
+    opacity: 1;
+  }
+  

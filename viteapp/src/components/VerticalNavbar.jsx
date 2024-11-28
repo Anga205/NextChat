@@ -14,34 +14,29 @@ const VerticalNavbar = () => {
   const username = localStorage.getItem('username');
 
   return (
-    <div className="h-screen w-64 fixed left-0 top-0 bg-gray-800 text-white flex flex-col items-center pt-8">
+    <div className="vertical-navbar">
       {/* Profile Section */}
-      <div className="flex flex-col items-center mb-5">
-        <img className="w-20 h-20 mb-2" src={"https://robohash.org/stefan-"+username} alt="Profile Icon" />
-        <div className="text-lg font-bold">{ display_name }</div>
-        <div className="text-lg">({ username })</div>
+      <div className="profile-section">
+        <img className="profile-icon" src={"https://robohash.org/stefan-"+username}></img>
+        <div className="profile-name">{ display_name }</div>
+        <div className="profile-name">({ username })</div>
       </div>
 
       {/* Navigation Links / Contacts List */}
-      <div className="w-full flex flex-col items-center">
-        <Link to="/chat" className="w-full text-center py-2 border-b border-gray-700 hover:bg-gray-700">
+      <div className="nav-links">
+        <Link to="/chat" className="nav-link">
           Chat
         </Link>
-        <Link to="/SettingsPage" className="w-full text-center py-2 border-b border-gray-700 hover:bg-gray-700">
+        <Link to="/SettingsPage" className="nav-link">
           Settings
         </Link>
-        <Link to="/SendReq" className="w-full text-center py-2 border-b border-gray-700 hover:bg-gray-700">
+        <Link to="/SendReq" className="nav-link">
           Requests
         </Link>
         {/* Add more links as needed */}
       </div>
 
-      {/* Logout Section */}
-      <div className="mt-auto pb-8">
-        <button className="bg-red-600 px-4 py-2 text-white text-lg rounded hover:bg-red-500" onClick={handleLogout}>
-          Logout
-        </button>
-      </div>
+
     </div>
   );
 };

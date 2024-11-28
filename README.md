@@ -1,4 +1,4 @@
-# MERN Chat Application
+# MERN-Stack Chat Application
 
 ## Description
 
